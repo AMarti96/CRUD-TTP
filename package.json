@@ -1,0 +1,25 @@
+{
+  "name": "test",
+  "version": "6.9.5",
+  "private": true,
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "big-integer": "^1.6.25",
+    "browserify": "^14.4.0",
+    "buffer": "^5.0.8",
+    "cors": "^2.8.4",
+    "crypto-js": "^3.1.9-1",
+    "request": "^2.83.0"
+  },
+  "main": "index.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "https://gitaid.upc.es/PE/Test2.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
