@@ -3,7 +3,7 @@ var express = require('express'),
 var cors = require('cors');
 var request=require('request');
 var router = express.Router();
-var CryptoJS= require('crypto-js/sha256');
+var nonRep = require('./nonRepudiation');
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
@@ -58,45 +58,23 @@ function genNRSA() {
 
 app.post('/repudiationThirdPart',function (req,res) {
 
-        var buffS;
-        /////////
-        var origin=req.body.origin;
-        var destination=req.body.destination;
-        var thirdpart=req.body.thirdpart;
-         sharedKey=req.body.key;
-        var modulus= bigInt(req.body.modulus);
-        var publicE=req.body.publicE;
-        /////////
-        var sigmessage=bigInt(req.body.signature);
-        var signature=sigmessage.modPow(publicE,modulus);
-        buffS=Buffer.from(signature.toString(16),'hex').toString();
-        //////////
-        var string=origin+"."+thirdpart+"."+destination+"."+sharedKey;
-        var hash=CryptoJS(string);
+    nonRep.checkPayloadTTP(req.body.origin,req.body.destination,req.body.thirdpart,req.body.key,req.body.modulus,req.body.publicE,req.body.signature,function (buff) {
 
-        if(hash==buffS){
+        if (buff === 1){
 
-            string=thirdpart+"."+origin+"."+destination+"."+sharedKey;
-            hash=CryptoJS(string);
-            var buff=Buffer.from(hash.toString(),'utf8');
-            var message=bigInt(buff.toString('hex'),16);
-            var enmessage=message.modPow(d,n);
-            data = {
-                thirdpart:thirdpart,
-                origin:origin,
-                destination:destination,
-                key:req.body.key,
-                signature: enmessage,
-                modulusTTP:n,
-                TTPE:e
-            };
-            console.log("colgando la clave para A y B")
+            nonRep.shareKey(req.body.origin,req.body.destination,req.body.thirdpart,d,n,e,req.body.key,function (buff2) {
+
+                data = buff2;
+                sharedKey = buff2.key;
                 res.send(data);
+
+
+            });
         }
         else {
             res.send("ERROR")
         }
-
+    });
 });
 
 app.get('/getKey',function (req,res) {
